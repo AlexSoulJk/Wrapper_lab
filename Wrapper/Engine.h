@@ -18,6 +18,7 @@ public:
             throw std::runtime_error("Engine_ERROR: Command " + command_name + " has not been registered");
         
         Wrapper<T>* wrapper = static_cast<Wrapper<T>*>(it->second);
+
         try {
             return wrapper->execute(args);
         }
