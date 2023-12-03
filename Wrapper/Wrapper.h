@@ -8,13 +8,19 @@
 template<typename T>
 class Wrapper {
 
-public:
-
     using Command = std::function<T(std::vector<T>&)>;
     using DefaultArguments = std::map<std::string, T>;
     using InputArguments = std::map<std::string, T>;
     template<typename Object, typename... Args>
     using ObjectMethod = T(Object::*)(Args...);
+
+    Command command;
+    DefaultArguments args;
+    int const size_args = 0;
+
+public:
+
+
 
     template<typename Object, typename... Args>
     Wrapper(Object* object, ObjectMethod<Object, Args...> method, DefaultArguments const& inputArgs) noexcept : size_args(sizeof ...(Args)), args(inputArgs) {
@@ -51,9 +57,6 @@ public:
     Wrapper() = delete;
     Wrapper(Wrapper&&) = default;
 private:
-    Command command;
-    DefaultArguments args;
-    int const size_args = 0;
 
     template<typename Object, typename Method, size_t... I>
     T call_method(Object* object, Method method, std::vector<T> inArgs, std::index_sequence<I...>) {
