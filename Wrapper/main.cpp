@@ -11,8 +11,8 @@ int main() {
         Engine engine;
         engine.register_command<int>(&wrapper, "summ");
         std::cout << engine.execute<int>("summ", { {"arg1", 6}, {"arg2", 10} }) << std::endl;
-        Wrapper<std::string> wrapperS(&subj, & Subj::getString);
-        engine.register_command<double>(&wrapperS, "getString", {});
+        Wrapper<std::string> wrapperS(&subj, &Subj::getString, {});
+        engine.register_command<std::string>(&wrapperS, "getString");
         std::cout << engine.execute<std::string>("getString", {}) << std::endl;
     }
     catch (std::runtime_error const& e) {

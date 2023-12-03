@@ -5,14 +5,14 @@ public:
 
     template<typename T>
     void register_command(Wrapper<T>* wrapper, std::string const& command_name){
-        if (commands.find(command) != commands.end())
+        if (commands.find(command_name) != commands.end())
             throw std::runtime_error("Engine_ERROR: Command " + command_name + " already exist");
-        commands.insert({ command, wrapper });
+        commands.insert({ command_name, wrapper });
     }
 
     template<typename T>
     T execute(const std::string& command_name, std::map<std::string, T> const args) {
-        auto it = commands.find(command);
+        auto it = commands.find(command_name);
 
         if (it == commands.end())
             throw std::runtime_error("Engine_ERROR: Command " + command_name + " has not been registered");

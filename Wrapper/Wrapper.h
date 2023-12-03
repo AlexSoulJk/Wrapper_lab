@@ -26,7 +26,7 @@ public:
         };
     }
 
-    T execute(InputArguments const& Args) {
+    T execute(InputArguments Args) {
         std::string nameOfInvalidArg = "";
         //validation of name of Input params.
         if (!isNamesOfInputParamValid(Args, nameOfInvalidArg))
