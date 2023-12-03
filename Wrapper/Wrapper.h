@@ -30,7 +30,7 @@ public:
         std::string nameOfInvalidArg = "";
         //validation of name of Input params.
         if (!isNamesOfInputParamValid(Args, nameOfInvalidArg))
-            throw std::runtime_error("Wrapper_ERROR: The param with name " + nameOfInvalidArg + "doesn't found!");
+            throw std::runtime_error("Wrapper_ERROR: The param with name " + std::move(nameOfInvalidArg) + "doesn't found in command ");
         std::vector<T> currentValues;
         //adding args into current values to invoke function
         for (auto const& arg : args) {
