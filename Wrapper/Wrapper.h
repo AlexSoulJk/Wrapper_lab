@@ -27,8 +27,17 @@ public:
     }
 
     T execute(InputArguments const& Args) {
-        std::vector<T> argsVec;
-        return command(argsVec);
+        std::string nameOfInvalidArg = "";
+        //validation of name of Input params.
+        if (!isNamesOfInputParamValid(Args, nameOfInvalidArg))
+            throw std::runtime_error("Wrapper_ERROR: The param with name " + nameOfInvalidArg + "doesn't found!");
+        std::vector<T> currentValues;
+        //adding args into current values to invoke function
+        for (auto const& arg : args) {
+            currentValues.push_back(Args.find(arg.first) != Args.end() ? Args[arg.first] : arg.second);
+        }
+
+        return command(currentValues);
     }
 
     Wrapper() = default;
@@ -39,10 +48,23 @@ public:
     ~Wrapper() = default;
 
 private:
+
     template<typename Object, typename Method, size_t... I>
     T call_method(Object* object, Method method, std::vector<T> inArgs, std::index_sequence<I...>) {
         return ((object->*method)(inArgs[I]...));
     }
+
+
+    bool isNamesOfInputParamValid(InputArguments const& Args, std::string nameOfInvalidArg) {
+        for (auto const& arg : Args) {
+            if (args.find(arg.first) == args.end()) {
+                nameOfInvalidArg = arg.first;
+                return false;
+            }
+        }
+        return true;
+    }
+
     Command command;
     DefaultArguments args;
 };
