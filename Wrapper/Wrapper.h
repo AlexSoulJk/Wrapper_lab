@@ -7,21 +7,20 @@
 
 template<typename T>
 class Wrapper {
+
+public:
+
     using Command = std::function<T(std::vector<T>&)>;
     using DefaultArguments = std::map<std::string, T>;
     using InputArguments = std::map<std::string, T>;
     template<typename Object, typename... Args>
     using ObjectMethod = T(Object::*)(Args...);
-public:
 
     template<typename Object, typename... Args>
-    Wrapper(Object* object, ObjectMethod<Object, Args...> method, DefaultArguments const& inputArgs) {
-        if (inputArgs.size() != sizeof ...(Args))
-        {
-            throw std::runtime_error("Wrapper_ERROR: The number of default arguments entered does not match the number of arguments for calling the method.");
-        }
-        args = inputArgs;
+    Wrapper(Object* object, ObjectMethod<Object, Args...> method, DefaultArguments const& inputArgs) noexcept : size_args(sizeof ...(Args)), args(inputArgs) {
         command = [this, object, method](std::vector<T> argsForFunc) {
+            if (argsForFunc.size() != size_args) 
+                throw std::runtime_error("Wrapper_ERROR: The number of default arguments entered does not match the number of arguments for calling the method ");
             return call_method(object, method, argsForFunc, std::make_index_sequence<sizeof...(Args)>{});
         };
     }
@@ -30,7 +29,7 @@ public:
         std::string nameOfInvalidArg = "";
         //validation of name of Input params.
         if (!isNamesOfInputParamValid(Args, nameOfInvalidArg))
-            throw std::runtime_error("Wrapper_ERROR: The param with name " + std::move(nameOfInvalidArg) + "doesn't found in command ");
+            throw std::runtime_error("Wrapper_ERROR: The param with name " + nameOfInvalidArg + "doesn't found in command ");
         std::vector<T> currentValues;
         //adding args into current values to invoke function
         for (auto const& arg : args) {
@@ -40,14 +39,21 @@ public:
         return command(currentValues);
     }
 
-    Wrapper() = default;
+    void setDefaultArgumets(DefaultArguments const& inputArgs) {
+        if (size_args != inputArgs.size()) 
+            throw std::runtime_error("Wrapper_ERROR: The number of default arguments entered does not match the number of arguments for calling the method ");
+        args = inputArgs;
+    }
+    Wrapper& operator=(Wrapper&&) noexcept = default;
+    ~Wrapper() noexcept = default;
     Wrapper(Wrapper const&) = delete;
     Wrapper& operator=(Wrapper const&) = delete;
+    Wrapper() = delete;
     Wrapper(Wrapper&&) = default;
-    Wrapper& operator=(Wrapper&&) = default;
-    ~Wrapper() = default;
-
 private:
+    Command command;
+    DefaultArguments args;
+    int const size_args = 0;
 
     template<typename Object, typename Method, size_t... I>
     T call_method(Object* object, Method method, std::vector<T> inArgs, std::index_sequence<I...>) {
@@ -65,6 +71,4 @@ private:
         return true;
     }
 
-    Command command;
-    DefaultArguments args;
 };
